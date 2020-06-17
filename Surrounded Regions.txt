@@ -1,0 +1,37 @@
+class Solution {
+public:
+    int dirX[4] = {0, 1, -1, 0};
+    int dirY[4] = {1, 0, 0, -1};
+    void util_dfs(vector<vector<char> > &board, int x, int y, int n, int m) {
+        if(board[x][y]=='#') return;
+        board[x][y] = '#';
+        for(int i=0; i<4; ++i) {
+            int newX = x + dirX[i];
+            int newY = y + dirY[i];
+            if(newX <= n-1 &&  newX >= 0 && newY >= 0 && newY <= m-1) {
+                if(board[newX][newY]=='O')
+                    util_dfs(board, newX, newY, n, m);
+            }
+        }
+    }
+    void solve(vector<vector<char>>& board) {
+        int n = board.size();
+        if(n==0)
+            return;
+        int m = board[0].size();
+        // This will do the DFS for all the boundary.
+        for(int i=0; i<n; ++i) {
+            for(int j=0; j<m; ++j) {
+                if((i==0 || j==m-1 || j==0 || i==n-1) && board[i][j]=='O') {
+                    util_dfs(board, i ,j, n, m);
+                }
+            }
+        }
+        for(int i=0; i < n; ++i) {
+            for(int j=0; j < m; ++j) {
+                // reset the boundary DFS traversal and other than that will be X.
+                board[i][j] = (board[i][j] =='#') ? 'O' : 'X';
+            }
+        }
+    }
+};
