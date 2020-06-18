@@ -1,0 +1,36 @@
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        if(citations.size()==0){
+            return 0;
+        }if(citations.size()==1){
+            if(citations[0]>=1)  return true;
+            else return false;
+        }
+        vector<int> ans;
+        iterate(citations.size(), citations,0,citations.size(),ans);
+        return ans[0];
+    }
+    
+    void iterate(int N,vector<int>& citations, int a, int b,vector<int>& ans){
+        if(b<a){
+            return;
+        }
+        int mid = (a+b)/2;
+        int right = N-mid;
+        int left = right-1;
+        if(left>=0 && citations[left]>mid){
+             iterate(N, citations,mid+1,b,ans);return;
+        }if(right<N && citations[right]<mid){
+            iterate(N, citations,a,mid-1,ans);return;
+        }if(left>=0 && right<N && citations[right]>=mid && citations[left]<=mid){
+            ans.push_back(mid);
+            iterate(N, citations,mid+1,b,ans);
+            return;
+        }if(left>=0 && citations[left]<=mid && right>=N){
+            ans.push_back(mid);return;
+        }if(right<N && citations[right]>=mid && left<0){
+            ans.push_back(mid);return;
+        }
+    }
+};
