@@ -1,0 +1,32 @@
+class Solution {
+public:
+          int numSquares(int n) {
+        if(n<4) return n ;
+        vector<int>sq;
+        give_me_the_squares_smaller_or_equal_than_n(sq,n) ;
+        
+        // below code is just the unbounded knapsack top down version
+        vector<int>dd(n+1) ; vector<vector<int>>dp(sq.size()+1,dd);
+        for(int i =0 ;i<=sq.size();i++){
+            for(int j = 0;j<=n;j++){
+                if(i==0 )  dp[i][j] = INT_MAX-199 ;
+                if(j==0) dp[i][j] = 0 ;
+                if(i>=1 && j>=1){
+                    if(j>=sq[i-1]) dp[i][j] = min(dp[i-1][j],1+dp[i][j-sq[i-1]]) ;
+                    else dp[i][j] = dp[i-1][j] ;
+                }
+            }
+        }
+        return dp[sq.size()][n] ;  
+    }
+	
+	void give_me_the_squares_smaller_or_equal_than_n(vector<int>&sq,int n){
+        long aa =  1; long ss = 0;
+        while(ss<=n) {
+            ss = aa*aa ;
+            sq.push_back(ss) ;
+            aa++ ;
+        }
+        sq.pop_back() ;
+    }
+};
