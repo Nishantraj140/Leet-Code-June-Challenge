@@ -1,0 +1,41 @@
+class Solution {
+    
+    unordered_map<string, vector<string>> edges;
+    
+    void makeItinerary(vector<string> *it, string current) {
+        vector<string> forwardPaths;
+
+        while (edges[current].size()) {
+            string nextStop = edges[current][0];
+            edges[current].erase(edges[current].begin());
+            makeItinerary(&forwardPaths, nextStop);
+            
+            for (auto i : forwardPaths) {
+                it->push_back(i);
+            }
+            forwardPaths.clear();
+        }
+        
+        it->push_back(current);
+    }
+    
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets) {
+        
+        // Construct graph
+        for (vector<string> &ticket: tickets) {
+            edges[ticket[0]].push_back(ticket[1]);
+        }
+        
+        // Edge list in sorted order
+        for (auto &edge_list: edges) {
+            sort(edge_list.second.begin(), edge_list.second.end());
+        }
+        
+        vector<string> itinerary;
+        makeItinerary(&itinerary, "JFK");
+        
+        reverse(itinerary.begin(), itinerary.end());
+        return itinerary;
+    }
+};
