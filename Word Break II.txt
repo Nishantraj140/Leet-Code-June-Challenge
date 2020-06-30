@@ -1,0 +1,112 @@
+class Solution {
+public:
+    
+    typedef struct TrieNode{
+        bool isEnd=0;
+        TrieNode* children[26];
+    }Node;
+    
+    Node * getNode(){
+        Node *n=new Node();
+        for(int i=0;i<26;++i){
+            n->children[i]=NULL;
+        }
+        return n;
+    }
+    
+    
+    Node *createTrie(vector<string>& words){
+        Node *trie=getNode();
+        for(int i=0;i<words.size();++i){
+            string w=words[i];
+            Node *cur=trie;
+            for(int j=0;j<w.length();++j){
+                if(cur->children[w[j]-'a']){
+                    cur=cur->children[w[j]-'a'];
+                }
+                else{
+                    cur->children[w[j]-'a']=getNode();
+                    cur=cur->children[w[j]-'a'];
+                } 
+            }
+            cur->isEnd=1;
+            
+        }
+        return trie;
+    }
+    
+    
+    bool isSafe(int i,int j,int n,int m){
+        if(i>=0 && j>=0 && i<n && j<m)
+            return 1;
+        return 0;
+    }
+    
+    int path[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+    
+    void dfsUtil(vector<vector<char>>& board,Node *cur,unordered_set<string> &ans,string &s,vector<vector<bool>> &vis,char current,int i,int j){
+         int n=board.size();
+         int m=board[0].size();
+         cur=cur->children[current-'a'];
+        if(cur->isEnd){
+            ans.insert(s);
+            bool flag=0;
+            for(int k=0;k<26;++k){
+                if(cur->children[k]!=NULL){
+                    flag=1;
+                    break;
+                }
+            }
+            if(flag){
+                cur->isEnd=0;
+                //can go futher some words might match after this
+            }
+            else{
+                //no possible words further so need not go further so returning
+                cur->isEnd=0;
+                return;
+            }
+        }
+        if(!vis[i][j]){
+            vis[i][j]=1;
+            for(int num=0;num<4;++num){
+                int inew=i+path[num][0];
+                int jnew=j+path[num][1];
+                if(isSafe(inew,jnew,n,m) && !vis[inew][jnew] && cur->children[board[inew][jnew]-'a']){
+                    s.push_back(board[inew][jnew]);
+                    dfsUtil(board,cur,ans,s,vis,board[inew][jnew],inew,jnew);
+                    s.pop_back();
+                }
+            }
+        }
+        vis[i][j]=0; //release this character for other combination to be used its not in the recursive stack any more as we have processed i,j completely
+    }
+    
+    void dfs(vector<vector<char>>& board,Node *trie,unordered_set<string> &ans){
+         int n=board.size();
+         int m=board[0].size();
+         vector<vector<bool>> vis(n+1,vector<bool>(m+1,0));
+        for(int i=0;i<n;++i){
+            for(int j=0;j<m;++j){
+                vector<vector<bool>> vis(n+1,vector<bool>(m+1,0));
+                string s="";
+                if(trie->children[board[i][j]-'a']){
+                    //probable we can get a word out of it
+                    s.push_back(board[i][j]);
+                    dfsUtil(board,trie,ans,s,vis,board[i][j],i,j);
+                }
+            }
+        }
+        
+    }
+    
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        unordered_set<string> ans;
+        int n=board.size();
+        int m=board[0].size();
+        Node *trie=createTrie(words);
+        dfs(board,trie,ans);
+        vector<string> r(ans.begin(),ans.end());
+        return r;
+    }
+}
